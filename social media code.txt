@@ -1,0 +1,46 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+def encode_image(image_location, msg):
+    def char_generator(message):
+        for c in message:
+            yield ord(c)
+    def gcd(x, y):
+        while y:
+            x, y = y, x % y
+        return x
+    img = cv2.imread(image_location)
+    msg_gen = char_generator(msg)
+    pattern = gcd(len(img), len(img[0]))
+    for i in range(len(img)):
+        for j in range(len(img[0])):
+            if (i * j + 1) % pattern == 0:
+                try:
+                    img[i][j][0] = next(msg_gen)
+                except StopIteration:
+                    img[i][j][0] = 255
+                    return img
+def decode_image(encoded_image):
+    def char_from_ascii(num):
+        return chr(num)
+    def gcd(x, y):
+        while y:
+            x, y = y, x % y
+        return x
+    msg = ""
+    img = encoded_image.copy()
+    pattern = gcd(len(encoded_image), len(encoded_image[0]))
+    for i in range(len(encoded_image)):
+        for j in range(len(encoded_image[0])):
+            if (i * j + 1) % pattern == 0:
+                msg += char_from_ascii(encoded_image[i][j][0])
+            else:
+               return msg
+image_location = "/content/social-media.png"
+img = plt.imread(image_location)
+message="djggjjsdn"
+encoded_image =encode_image(image_location,message)
+decode_message =decode_image(encoded_image)
+plt.imshow(img)
+print("Image encoded successfully with the secret text")
+print("Decode message:", message)
